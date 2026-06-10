@@ -1,6 +1,7 @@
 ## Data Setup
 Data files are not stored in this repository due to size constraints.
-Download from: (https://drive.google.com/drive/folders/1NYfYCJvgmE7Gay2oawZWb8ZWBTFLSW38?usp=drive_link)
+
+Download from: [Google Drive](https://drive.google.com/drive/folders/1NYfYCJvgmE7Gay2oawZWb8ZWBTFLSW38?usp=drive_link
 
 Place the following four files in a local `Data/` folder before running any notebooks:
 - `cleaned_transcripts_final.csv` — main dataset (Phase 2 input)
