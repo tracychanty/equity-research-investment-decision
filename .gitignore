@@ -1,0 +1,6 @@
+# .gitignore
+Data/*.csv
+Data/*.pkl
+Data/*.txt
+*.csv
+*.pkl
