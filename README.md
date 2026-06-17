@@ -35,14 +35,47 @@ Place all files in the correct local folders before running any notebooks:
 - `best_model.pkl` — final model: Random Forest (Baseline), test AUC = 0.5330
 - `scaler.pkl` — StandardScaler fit on train set (for Logistic Regression / Phase 5)
 - `final_model_name.txt` — name of selected final model
-- 
+
+#### Phase 5 outputs — place in `Outputs/price_forecasting/`
+- `quantile_forecast_summary_tuned.csv` — MAE, RMSE, R², coverage across all 3 horizons
+- `quantile_predictions_return_5d.csv` — median, lower (5th), upper (95th) predictions
+- `quantile_predictions_return_10d.csv` — median, lower (5th), upper (95th) predictions
+- `quantile_predictions_return_20d.csv` — median, lower (5th), upper (95th) predictions
+- `quantile_feature_importance_return_5d.csv` — LightGBM feature importances (5d)
+- `quantile_feature_importance_return_10d.csv` — LightGBM feature importances (10d)
+- `quantile_feature_importance_return_20d.csv` — LightGBM feature importances (20d)
+- `quantile_median_model_return_5d.pkl` — trained median LightGBM model (5d)
+- `quantile_median_model_return_10d.pkl` — trained median LightGBM model (10d)
+- `quantile_median_model_return_20d.pkl` — trained median LightGBM model (20d)
+- `quantile_lower_model_return_5d.pkl` — trained 5th percentile model (5d)
+- `quantile_lower_model_return_10d.pkl` — trained 5th percentile model (10d)
+- `quantile_lower_model_return_20d.pkl` — trained 5th percentile model (20d)
+- `quantile_upper_model_return_5d.pkl` — trained 95th percentile model (5d)
+- `quantile_upper_model_return_10d.pkl` — trained 95th percentile model (10d)
+- `quantile_upper_model_return_20d.pkl` — trained 95th percentile model (20d)
+
+#### Phase 6 outputs — place in `Outputs/shap_explainability/`
+- `shap_feature_importance.csv` — top 20 features by mean |SHAP| (Table 1)
+- `sentiment_feature_importance.csv` — top 10 sentiment features by mean |SHAP| (Table 2)
+- `shap_group_summary.csv` — feature group contributions: Financial 40.8%, Market 32.2%, Sentiment 23.5%, Sector 3.4% (Table 3)
+- `shap_values_test.csv` — raw SHAP values matrix (1,000 × 48)
+- `shap_global_bar.png` — Figure 1: global feature importance bar chart
+- `shap_beeswarm.png` — Figure 2: beeswarm plot showing feature impact direction
+- `shap_group_contribution.png` — Figure 3: feature group contribution chart
+- `shap_dependence_net_sentiment.png` — Figure 4: net sentiment dependence plot
+- `shap_dependence_sentiment_surprise.png` — Figure 5: sentiment surprise dependence plot
+- `shap_dependence_cost_cutting_score.png` — Figure 6: cost cutting score dependence plot
+- `shap_waterfall_confident_up.png` — Figure 7: local explanation, confident UP (P=0.624)
+- `shap_waterfall_confident_down.png` — Figure 8: local explanation, confident DOWN (P=0.282)
+- `shap_waterfall_borderline.png` — Figure 9: local explanation, borderline (P=0.500)
+  
 ## Phase Structure
 - Phase 1: `data_preparation.ipynb` ✅ Complete
 - Phase 2: `sentiment_extraction.ipynb` ✅ Complete
 - Phase 3: `feature.py` ✅ Complete
 - Phase 4: `classification.ipynb` ✅ Complete
-- Phase 5: Price Forecasting
-- Phase 6: Explainability (SHAP)
+- Phase 5: Price Forecasting ✅ Complete
+- Phase 6: Explainability (SHAP) ✅ Complete
 - Phase 7: Industry Benchmarking
 - Phase 8: Portfolio Construction & Recommendation
 - Phase 9: Equity Research Dashboard
