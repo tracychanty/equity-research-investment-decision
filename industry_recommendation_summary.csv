@@ -1,0 +1,36 @@
+sector,recommendation,count
+Basic Materials,Avoid,36
+Basic Materials,Buy,8
+Basic Materials,Hold,63
+Communication Services,Avoid,35
+Communication Services,Buy,6
+Communication Services,Hold,64
+Consumer Cyclical,Avoid,101
+Consumer Cyclical,Buy,21
+Consumer Cyclical,Hold,151
+Consumer Defensive,Avoid,38
+Consumer Defensive,Buy,4
+Consumer Defensive,Hold,66
+Energy,Avoid,25
+Energy,Buy,4
+Energy,Hold,69
+Financial Services,Avoid,92
+Financial Services,Buy,10
+Financial Services,Hold,176
+Healthcare,Avoid,102
+Healthcare,Buy,23
+Healthcare,Hold,173
+Industrials,Avoid,95
+Industrials,Buy,8
+Industrials,Hold,163
+Real Estate,Avoid,38
+Real Estate,Buy,3
+Real Estate,Hold,98
+Technology,Avoid,121
+Technology,Buy,26
+Technology,Hold,195
+Unknown,Buy,1
+Unknown,Hold,2
+Utilities,Avoid,18
+Utilities,Buy,3
+Utilities,Hold,40
