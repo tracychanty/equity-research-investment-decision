@@ -1,52 +1,55 @@
-# ── Data files ────────────────────────────────────────────────────────────────
-Data/*.csv
-Data/*.pkl
-Data/*.txt
-
-# ── Output files ──────────────────────────────────────────────────────────────
-Outputs/
+# ── Data files ─────────────────────────────────────────────────
+Data/
 *.csv
 *.pkl
+*.sqlite
+*.db
 
-# ── Jupyter checkpoints ───────────────────────────────────────────────────────
+# ── Output files ───────────────────────────────────────────────
+Outputs/
+*.png
+*.jpg
+*.jpeg
+
+# ── Jupyter notebooks checkpoints ──────────────────────────────
 .ipynb_checkpoints/
-**/.ipynb_checkpoints/
+*/.ipynb_checkpoints/
 
-# ── Python ───────────────────────────────────────────────────────────────────
+# ── Python ─────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 .Python
+*.egg
 *.egg-info/
 dist/
 build/
-.eggs/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
 
-# ── Virtual environments ──────────────────────────────────────────────────────
-venv/
+# ── Virtual environments ────────────────────────────────────────
+.env
+.venv
 env/
-.env/
-.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# ── macOS ─────────────────────────────────────────────────────────────────────
-.DS_Store
-.AppleDouble
-.LSOverride
-Thumbs.db
+# ── Streamlit ──────────────────────────────────────────────────
+.streamlit/secrets.toml
 
-# ── IDE ───────────────────────────────────────────────────────────────────────
+# ── IDE and OS ─────────────────────────────────────────────────
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
-
-# ── Logs ──────────────────────────────────────────────────────────────────────
-*.log
-logs/
-
-# ── Model checkpoints ─────────────────────────────────────────────────────────
-*.pt
-*.pth
-*.bin
-models/
