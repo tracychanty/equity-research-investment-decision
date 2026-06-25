@@ -68,6 +68,12 @@ Place all files in the correct local folders before running any notebooks:
 - `shap_waterfall_confident_up.png` — Figure 7: local explanation, confident UP (P=0.624)
 - `shap_waterfall_confident_down.png` — Figure 8: local explanation, confident DOWN (P=0.282)
 - `shap_waterfall_borderline.png` — Figure 9: local explanation, borderline (P=0.500)
+
+#### Phase 7 outputs — place in `Outputs/industry_benchmarking/`
+- `industry_benchmarking_output.csv` — composite scores and rankings for all tickers (34 columns)
+- `industry_top10_by_sector.csv` — top 10 ranked tickers per sector by overall score
+- `industry_recommendation_summary.csv` — Buy / Hold / Avoid counts by sector
+- `equity_research_outputs.sqlite` — SQLite database with all three tables
   
 ## Phase Structure
 - Phase 1: `data_preparation.ipynb` ✅ Complete
@@ -76,6 +82,6 @@ Place all files in the correct local folders before running any notebooks:
 - Phase 4: `classification.ipynb` ✅ Complete
 - Phase 5: Price Forecasting ✅ Complete
 - Phase 6: Explainability (SHAP) ✅ Complete
-- Phase 7: Industry Benchmarking
+- Phase 7: Industry Benchmarking ✅ Complete
 - Phase 8: Portfolio Construction & Recommendation
 - Phase 9: Equity Research Dashboard
