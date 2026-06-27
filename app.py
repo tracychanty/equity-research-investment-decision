@@ -103,6 +103,10 @@ def load_main():
     return df
 
 @st.cache_data
+def load_classification():
+    return pd.read_csv("Outputs/classification/final_model_comparison.csv")
+
+@st.cache_data
 def load_shap_importance():
     return pd.read_csv("Outputs/shap_explainability/shap_feature_importance.csv")
 
@@ -115,16 +119,84 @@ def load_sentiment_importance():
     return pd.read_csv("Outputs/shap_explainability/sentiment_feature_importance.csv")
 
 @st.cache_data
-def load_classification():
-    return pd.read_csv("Outputs/classification/final_model_comparison.csv")
-
-@st.cache_data
 def load_price_forecast(horizon):
     path = f"Outputs/price_forecasting/quantile_predictions_{horizon}.csv"
     if os.path.exists(path):
         df = pd.read_csv(path)
         df["earnings_date"] = pd.to_datetime(df["earnings_date"])
         return df
+    return None
+
+@st.cache_data
+def load_forecast_summary():
+    path = "Outputs/price_forecasting/quantile_forecast_summary_tuned.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_forecast_importance(horizon):
+    path = f"Outputs/price_forecasting/quantile_feature_importance_{horizon}.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_benchmark():
+    path = "Outputs/industry_benchmarking/industry_benchmarking_output.csv"
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+        df["earnings_date"] = pd.to_datetime(df["earnings_date"])
+        return df
+    return None
+
+@st.cache_data
+def load_benchmark_top10():
+    path = "Outputs/industry_benchmarking/industry_top10_by_sector.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_recommendation_summary():
+    path = "Outputs/industry_benchmarking/industry_recommendation_summary.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_event_study():
+    path = "Outputs/event_study/abnormal_returns.csv"
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+        df["earnings_date"] = pd.to_datetime(df["earnings_date"])
+        df["sentiment_quartile"] = pd.Categorical(
+            df["sentiment_quartile"],
+            categories=["Q1 (most negative)", "Q2", "Q3", "Q4 (most positive)"],
+            ordered=True
+        )
+        return df
+    return None
+
+@st.cache_data
+def load_sector_significance():
+    path = "Outputs/event_study/sector_significance.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_significance_summary():
+    path = "Outputs/event_study/significance_summary.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    return None
+
+@st.cache_data
+def load_robustness():
+    path = "Outputs/classification/robustness_summary.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
     return None
 
 # ── Sidebar ───────────────────────────────────────────────────
