@@ -85,3 +85,4 @@ Place all files in the correct local folders before running any notebooks:
 - Phase 7: Industry Benchmarking ✅ Complete
 - Phase 8: Portfolio Construction & Recommendation
 - Phase 9: Equity Research Dashboard
+- Stretch Goal 1: `event_study.ipynb` ✅ Complete
