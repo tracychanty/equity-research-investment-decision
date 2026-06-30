@@ -74,6 +74,27 @@ Place all files in the correct local folders before running any notebooks:
 - `industry_top10_by_sector.csv` — top 10 ranked tickers per sector by overall score
 - `industry_recommendation_summary.csv` — Buy / Hold / Avoid counts by sector
 - `equity_research_outputs.sqlite` — SQLite database with all three tables
+
+#### Phase 8 outputs — place in `Outputs/event_study/`
+- `events_prepared.csv` — 13,760 valid earnings events with estimation and event windows
+- `prices_with_returns.csv` — daily stock and market returns aligned for event study
+- `capm_estimates.csv` — CAPM alpha, beta, R² per event (estimation window [-120, -10])
+- `abnormal_returns.csv` — AR and CAR across 6 windows per event with sentiment groups
+- `significance_summary.csv` — combined Q4 vs Q1 significance: t-test and Mann-Whitney
+- `one_sample_tests.csv` — one-sample t-test results per quartile group
+- `welch_ttest_results.csv` — Welch's two-sample t-test Q4 vs Q1 per window
+- `mann_whitney_tests.csv` — Mann-Whitney U non-parametric test results
+- `sector_car_summary.csv` — CAR by sector and sentiment quartile group
+- `sector_significance.csv` — t-test significance per sector (CAR_0_1 and CAR_minus1_1)
+- `sector_sentiment.csv` — average sentiment scores by sector
+- `monotonic_relationship.csv` — CAR progression across Q1 to Q4 quartiles
+- `plots/fig1_car_event_time.png` — cumulative abnormal returns Q1 vs Q4 (day -1 to +10)
+- `plots/fig2_sector_heatmap.png` — sector × window heatmap of Q4 - Q1 CAR difference
+- `plots/fig3_surprise_vs_car.png` — sentiment surprise vs CAR[0,1] scatter (r = 0.057)
+- `plots/fig4_ar_distribution.png` — AR distribution Q1 vs Q4 for AR[0] and CAR[0,1]
+- `plots/fig5_sector_significance.png` — sector bar chart coloured by significance level
+- `plots/fig6_shap_event_bridge.png` — SHAP ML importance vs event study economic impact
+- `plots/fig7_monotonic_relationship.png` — CAR bar chart Q1 to Q4 for CAR[0,1] and CAR[-1,1]
   
 ## Phase Structure
 - Phase 1: `data_preparation.ipynb` ✅ Complete
