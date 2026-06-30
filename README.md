@@ -75,7 +75,7 @@ Place all files in the correct local folders before running any notebooks:
 - `industry_recommendation_summary.csv` — Buy / Hold / Avoid counts by sector
 - `equity_research_outputs.sqlite` — SQLite database with all three tables
 
-#### Phase 8 outputs — place in `Outputs/event_study/`
+#### Stretch Goal 1 outputs — place in `Outputs/event_study/`
 - `events_prepared.csv` — 13,760 valid earnings events with estimation and event windows
 - `prices_with_returns.csv` — daily stock and market returns aligned for event study
 - `capm_estimates.csv` — CAPM alpha, beta, R² per event (estimation window [-120, -10])
