@@ -18,3 +18,4 @@ seaborn>=0.12.0
 
 # ── Statistics (event study) ───────────────────────────────────
 scipy>=1.11.0
+seaborn>=0.12.0
