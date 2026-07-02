@@ -75,6 +75,21 @@ Place all files in the correct local folders before running any notebooks:
 - `industry_recommendation_summary.csv` — Buy / Hold / Avoid counts by sector
 - `equity_research_outputs.sqlite` — SQLite database with all three tables
 
+#### Phase 8 outputs — place in `Outputs/portfolio_construction/`
+- `portfolio_candidate_universe.csv` — full candidate universe with scores and predicted returns
+- `portfolio_candidate_summary.csv` — summary statistics of candidate universe
+- `portfolio_top10_candidates.csv` — top 10 candidates per quarter
+- `portfolio_weights.csv` — portfolio weights per quarter (equal weight and market cap weight)
+- `portfolio_weight_check.csv` — weight validation checks
+- `v3_portfolio_net_returns_wide.csv` — quarterly net returns wide format (all strategies)
+- `v3_portfolio_returns_long.csv` — quarterly returns long format
+- `v3_portfolio_cumulative_returns.csv` — cumulative returns over backtest period
+- `v3_portfolio_drawdowns.csv` — drawdown series per strategy
+- `v3_portfolio_weights.csv` — final optimised portfolio weights
+- `portfolio_performance_metrics.csv` — Sharpe ratio, CAGR, max drawdown, volatility
+- `portfolio_performance_metrics_report.csv` — formatted performance report
+- `main_strategy_summary.csv` — ML_Optimized strategy summary statistics
+
 #### Stretch Goal 1 outputs — place in `Outputs/event_study/`
 - `events_prepared.csv` — 13,760 valid earnings events with estimation and event windows
 - `prices_with_returns.csv` — daily stock and market returns aligned for event study
@@ -95,7 +110,7 @@ Place all files in the correct local folders before running any notebooks:
 - `plots/fig5_sector_significance.png` — sector bar chart coloured by significance level
 - `plots/fig6_shap_event_bridge.png` — SHAP ML importance vs event study economic impact
 - `plots/fig7_monotonic_relationship.png` — CAR bar chart Q1 to Q4 for CAR[0,1] and CAR[-1,1]
-  
+
 ## Phase Structure
 - Phase 1: `data_preparation.ipynb` ✅ Complete
 - Phase 2: `sentiment_extraction.ipynb` ✅ Complete
@@ -104,6 +119,6 @@ Place all files in the correct local folders before running any notebooks:
 - Phase 5: Price Forecasting ✅ Complete
 - Phase 6: Explainability (SHAP) ✅ Complete
 - Phase 7: Industry Benchmarking ✅ Complete
-- Phase 8: Portfolio Construction & Recommendation
+- Phase 8: Portfolio Construction & Recommendation ✅ Complete
 - Phase 9: Equity Research Dashboard
 - Stretch Goal 1: `event_study.ipynb` ✅ Complete
