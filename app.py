@@ -157,6 +157,14 @@ def load_main():
 def load_classification():
     return pd.read_csv("Outputs/classification/final_model_comparison.csv")
 
+@st.cache_data
+def load_robustness():
+    return pd.read_csv("Outputs/classification/robustness_summary.csv")
+
+@st.cache_data
+def load_forecast_summary():
+    return pd.read_csv("Outputs/price_forecasting/quantile_forecast_summary_tuned.csv")
+
 # Feature → group mapping for SHAP drill-down. Reverse-engineered from
 # shap_values_test.csv column names and validated against
 # Outputs/shap_explainability/shap_group_summary.csv — grouping every
@@ -1039,15 +1047,60 @@ elif page == "💡  Investment Recommendations":
 # ══════════════════════════════════════════════════════════════
 elif page == "📊  Model Validation":
     st.markdown('<div class="page-title">Model Validation</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Classification accuracy, forecasting metrics, and explainability results — full transparency on how Investor Copilot works</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Held-out test performance, robustness checks, and forecast reliability</div>', unsafe_allow_html=True)
+
+    # ── Key Takeaways (KPI cards) ────────────────────────────────
+    try:
+        _results_kt = load_classification()
+        _results_kt = _results_kt[_results_kt["Model"] != "Dummy Classifier"].copy()
+        _best_row = _results_kt.loc[_results_kt["AUC_ROC"].idxmax()]
+
+        _rob_kt = load_robustness()
+        _rob_kt = _rob_kt[_rob_kt["Model"] != "Dummy Classifier"].copy()
+        _rf_rob = _rob_kt[_rob_kt["Model"] == "Random Forest"].iloc[0]
+        _horizon_trend = f"{_rf_rob['AUC_5d']:.3f} → {_rf_rob['AUC_20d']:.3f}"
+
+        _fc_kt = load_forecast_summary()
+        _r2_range = f"{_fc_kt['R2'].min():.3f}–{_fc_kt['R2'].max():.3f}"
+
+        kpi_cols = st.columns(4)
+        kpis = [
+            ("Best Classifier", _best_row["Model"], f"AUC-ROC {_best_row['AUC_ROC']:.3f}"),
+            ("5-Day AUC-ROC", f"{_best_row['AUC_ROC']:.3f}", "vs. 0.500 dummy baseline"),
+            ("Forecasting Power", f"R² {_r2_range}", "limited magnitude accuracy"),
+            ("Random Forest AUC Trend", _horizon_trend, "5-day AUC → 20-day AUC"),
+        ]
+        for col, (label, value, sub) in zip(kpi_cols, kpis):
+            with col:
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-label">{label}</div>
+                    <div class="metric-value" style="font-size:1.15rem;">{value}</div>
+                    <div class="metric-sub">{sub}</div>
+                </div>""", unsafe_allow_html=True)
+
+        st.markdown("<div style='margin-top:0.5rem;'></div>", unsafe_allow_html=True)
+        st.caption("Evaluated on a held-out 2022–2023 test set of 3,387 earnings calls (never seen during training).")
+    except Exception as e:
+        st.caption(f"Key takeaways unavailable ({e})")
 
     # ── Classification results ─────────────────────────────────
-    st.markdown('<div class="section-header">📈 Classification Model Comparison (Test Set 2022–2023)</div>',
+    st.markdown('<div class="section-header">Classification Model Comparison (Test Set 2022–2023)</div>',
                 unsafe_allow_html=True)
 
     try:
         results = load_classification()
         results = results[results["Model"] != "Dummy Classifier"].copy()
+
+        final_model_row = results[results["Notes"].fillna("").str.contains("FINAL MODEL")] \
+            if "Notes" in results.columns else pd.DataFrame()
+        final_model_name = final_model_row.iloc[0]["Model"] if not final_model_row.empty else "Random Forest"
+        st.markdown(f"""
+        <div style='display:inline-block;background:#111827;border:1px solid #3b82f6;border-radius:20px;
+                    padding:0.35rem 0.9rem;margin-bottom:0.75rem;'>
+            <span style='color:#64748b;font-size:0.75rem;'>Selected final model:</span>
+            <span style='color:#3b82f6;font-weight:700;font-size:0.85rem;margin-left:0.4rem;'>{final_model_name} (baseline)</span>
+        </div>""", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
 
@@ -1057,7 +1110,7 @@ elif page == "📊  Model Validation":
             fig = go.Figure(go.Bar(
                 x=results["AUC_ROC"], y=results["Model"],
                 orientation="h", marker_color=colors_bar,
-                text=results["AUC_ROC"].round(4),
+                text=[f"{v:.4f}" for v in results["AUC_ROC"]],
                 textposition="outside", textfont=dict(color="#94a3b8", size=10)
             ))
             fig.add_vline(x=0.5, line_dash="dash", line_color="#ef4444",
@@ -1069,6 +1122,36 @@ elif page == "📊  Model Validation":
             st.plotly_chart(fig, use_container_width=True)
 
         with col2:
+            # Precision vs Recall - more intuitive for investment use than F1 alone:
+            # Precision = when the model signals BUY, how often is it right;
+            # Recall = of the actual UP moves, how many did it catch.
+            fig_pr = go.Figure()
+            fig_pr.add_trace(go.Bar(name="Precision", y=results["Model"], x=results["Precision"],
+                                    orientation="h", marker_color="#3b82f6"))
+            fig_pr.add_trace(go.Bar(name="Recall", y=results["Model"], x=results["Recall"],
+                                    orientation="h", marker_color="#10b981"))
+            fig_pr.update_layout(**PLOT_THEME, height=280, barmode="group",
+                              title="Precision vs Recall by Model",
+                              xaxis_title="Score", yaxis_title="")
+            fig_pr.update_layout(legend=dict(orientation="h", y=-0.35, x=0.5, xanchor="center"))
+            fig_pr.update_layout(margin=dict(l=20, r=20, t=50, b=90))
+            st.plotly_chart(fig_pr, use_container_width=True)
+
+        _auc_min, _auc_max = results["AUC_ROC"].min(), results["AUC_ROC"].max()
+        _best_model_name = results.loc[results["AUC_ROC"].idxmax(), "Model"]
+        st.caption(f"{_best_model_name} leads, but all models cluster in a tight "
+                  f"{_auc_min:.3f}–{_auc_max:.3f} AUC range.")
+
+        if "show_classification_table" not in st.session_state:
+            st.session_state.show_classification_table = False
+
+        if st.button("Show Detailed Metrics Table" if not st.session_state.show_classification_table
+                     else "Hide Detailed Metrics Table",
+                     use_container_width=True):
+            st.session_state.show_classification_table = not st.session_state.show_classification_table
+            st.rerun()
+
+        if st.session_state.show_classification_table:
             display_cols = ["Model", "AUC_ROC", "Accuracy", "Precision", "Recall", "F1"]
             show = results[[c for c in display_cols if c in results.columns]].copy()
             st.dataframe(
@@ -1076,7 +1159,7 @@ elif page == "📊  Model Validation":
                 .highlight_max(subset=["AUC_ROC", "Accuracy", "F1"], color="#1e3a5f")
                 .format({"AUC_ROC": "{:.4f}", "Accuracy": "{:.4f}",
                          "Precision": "{:.4f}", "Recall": "{:.4f}", "F1": "{:.4f}"}),
-                use_container_width=True, height=260
+                use_container_width=True, height=210
             )
 
     except Exception as e:
@@ -1085,153 +1168,166 @@ elif page == "📊  Model Validation":
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
     # ── Robustness ─────────────────────────────────────────────
-    st.markdown('<div class="section-header">🔁 Robustness — AUC Across Prediction Horizons</div>',
+    st.markdown('<div class="section-header">Robustness — AUC Across Prediction Horizons</div>',
                 unsafe_allow_html=True)
 
-    rob_data = {
-        "Model": ["Logistic Regression", "Random Forest", "XGBoost", "LightGBM"],
-        "5d":    [0.5285, 0.5330, 0.5190, 0.5195],
-        "10d":   [0.5611, 0.5613, 0.5540, 0.5486],
-        "20d":   [0.5530, 0.5657, 0.5612, 0.5650],
-    }
-    rob_df = pd.DataFrame(rob_data)
-    colors_rob = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
+    try:
+        rob_df = load_robustness()
+        rob_df_models = rob_df[rob_df["Model"] != "Dummy Classifier"].copy()
+        colors_rob = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
 
-    fig = go.Figure()
-    for i, model in enumerate(rob_df["Model"]):
-        fig.add_trace(go.Scatter(
-            x=["5-day", "10-day", "20-day"],
-            y=rob_df[rob_df["Model"] == model][["5d", "10d", "20d"]].values[0],
-            name=model, line=dict(color=colors_rob[i], width=2),
-            mode="lines+markers", marker=dict(size=8)
-        ))
-    fig.add_hline(y=0.55, line_dash="dash", line_color="#64748b",
-                  opacity=0.5, annotation_text="0.55 acceptable threshold",
-                  annotation_font_color="#64748b", annotation_font_size=9)
-    fig.update_layout(**PLOT_THEME, height=300,
-                      xaxis_title="Prediction Horizon", yaxis_title="AUC-ROC",
-                      legend=dict(orientation="h", y=1.12))
-    st.plotly_chart(fig, use_container_width=True)
+        fig = go.Figure()
+        for i, model in enumerate(rob_df_models["Model"]):
+            row = rob_df_models[rob_df_models["Model"] == model].iloc[0]
+            y_vals = [row["AUC_5d"], row["AUC_10d"], row["AUC_20d"]]
+            is_winner = (model == "Random Forest")
+            color = colors_rob[i % len(colors_rob)]
+            fig.add_trace(go.Scatter(
+                x=["5-day", "10-day", "20-day"], y=y_vals,
+                name=model, line=dict(color=color, width=4 if is_winner else 2),
+                mode="lines+markers",
+                marker=dict(size=11 if is_winner else 8),
+            ))
 
-    st.markdown("""
-    <div class="info-box">
-        ✅ <strong style="color:#f1f5f9;">Random Forest wins consistently</strong> — it is the best-performing model
-        across all three horizons (5d, 10d, 20d), with AUC improving from 0.533 → 0.566 → 0.566
-        as the prediction window lengthens. This confirms results are not an artefact of the labelling choice.
-    </div>""", unsafe_allow_html=True)
+        fig.add_hline(y=0.5, line_dash="dash", line_color="#ef4444",
+                      opacity=0.5, annotation_text="Dummy baseline",
+                      annotation_font_color="#ef4444", annotation_font_size=9)
+        fig.add_hline(y=0.55, line_dash="dash", line_color="#64748b",
+                      opacity=0.5, annotation_text="0.55 acceptable threshold",
+                      annotation_font_color="#64748b", annotation_font_size=9)
+        fig.update_layout(**PLOT_THEME, height=300,
+                          xaxis_title="Prediction Horizon", yaxis_title="AUC-ROC")
+        # Separate vertical legend to the right of the plot, rather than labels
+        # clustered at the line endpoints (which collide when models finish
+        # nearly identical - e.g. Random Forest and LightGBM are only 0.0007
+        # AUC apart at 20-day).
+        fig.update_layout(legend=dict(orientation="v", x=1.02, y=1, xanchor="left", yanchor="top"))
+        fig.update_layout(margin=dict(l=20, r=160, t=40, b=20))
+        st.plotly_chart(fig, use_container_width=True)
+
+        best_row = rob_df_models.set_index("Model")
+        rf_row = best_row.loc["Random Forest"] if "Random Forest" in best_row.index else None
+        if rf_row is not None:
+            st.markdown(f"""
+            <div class="info-box">
+                ✅ <strong style="color:#f1f5f9;">Random Forest wins consistently</strong> — it is the best-performing model
+                across all three horizons (5d, 10d, 20d), with AUC improving from {rf_row['AUC_5d']:.3f} → {rf_row['AUC_10d']:.3f} → {rf_row['AUC_20d']:.3f}
+                as the prediction window lengthens. This confirms results are not an artefact of the labelling choice.
+            </div>""", unsafe_allow_html=True)
+
+    except Exception as e:
+        st.info(f"Robustness results not found. ({e})")
 
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
     # ── Price forecasting ──────────────────────────────────────
-    st.markdown('<div class="section-header">💹 Price Forecasting — LightGBM Quantile Regression</div>',
-                unsafe_allow_html=True)
-
-    forecast_metrics = {
-        "Horizon":       ["5-day",  "10-day", "20-day"],
-        "Model MAE":     [0.0412,   0.0581,   0.0793],
-        "Baseline MAE":  [0.0471,   0.0652,   0.0891],
-        "Model RMSE":    [0.0598,   0.0841,   0.1124],
-        "Coverage (90%)":[0.872,    0.884,    0.891],
-    }
-    fc_df = pd.DataFrame(forecast_metrics)
-
-    col_fc1, col_fc2 = st.columns(2)
-    with col_fc1:
-        fig = go.Figure()
-        fig.add_trace(go.Bar(name="Model MAE", x=fc_df["Horizon"],
-                             y=fc_df["Model MAE"], marker_color="#3b82f6"))
-        fig.add_trace(go.Bar(name="Baseline MAE", x=fc_df["Horizon"],
-                             y=fc_df["Baseline MAE"], marker_color="#1e3a5f"))
-        fig.update_layout(**PLOT_THEME, height=260, barmode="group",
-                          title="MAE: Model vs Baseline",
-                          yaxis_title="MAE", xaxis_title="")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col_fc2:
-        fig = go.Figure(go.Bar(
-            x=fc_df["Horizon"],
-            y=fc_df["Coverage (90%)"] * 100,
-            marker_color=["#10b981" if c > 0.85 else "#f59e0b"
-                          for c in fc_df["Coverage (90%)"]],
-            text=[f"{c*100:.1f}%" for c in fc_df["Coverage (90%)"]],
-            textposition="outside"
-        ))
-        fig.add_hline(y=90, line_dash="dash", line_color="#475569",
-                      opacity=0.6, annotation_text="Target 90%",
-                      annotation_font_size=9)
-        fig.update_layout(**PLOT_THEME, height=260,
-                          title="90% Confidence Interval Coverage",
-                          yaxis_title="Coverage (%)", xaxis_title="",
-                          yaxis_range=[80, 100])
-        st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
-
-    # ── SHAP group summary ─────────────────────────────────────
-    st.markdown('<div class="section-header">🧠 SHAP Explainability — Feature Group Contribution</div>',
+    st.markdown('<div class="section-header">Price Forecasting — LightGBM Quantile Regression</div>',
                 unsafe_allow_html=True)
 
     try:
-        shap_group = load_shap_group()
-        col_g1, col_g2 = st.columns(2)
-        with col_g1:
-            fig = px.pie(
-                shap_group, values="Contribution_pct", names="Group", hole=0.5,
-                color="Group",
-                color_discrete_map={"Financial": "#3b82f6", "Market": "#10b981",
-                                     "Sentiment": "#f59e0b", "Sector": "#8b5cf6"}
-            )
-            fig.update_layout(**PLOT_THEME, height=260)
-            fig.update_traces(textinfo="percent+label", textfont_size=11)
+        fc_df = load_forecast_summary()
+        fc_df = fc_df.copy()
+        fc_df["Horizon"] = fc_df["Target"].map({
+            "return_5d": "5-day", "return_10d": "10-day", "return_20d": "20-day"
+        }).fillna(fc_df["Target"])
+
+        col_fc1, col_fc2, col_fc3 = st.columns(3)
+        with col_fc1:
+            fig = go.Figure()
+            fig.add_trace(go.Bar(name="Model MAE", x=fc_df["Horizon"],
+                                 y=fc_df["Model_MAE"], marker_color="#3b82f6"))
+            fig.add_trace(go.Bar(name="Baseline MAE", x=fc_df["Horizon"],
+                                 y=fc_df["Baseline_MAE"], marker_color="#1e3a5f"))
+            fig.update_layout(**PLOT_THEME, height=280, barmode="group",
+                              title="MAE: Model vs Baseline",
+                              yaxis_title="MAE", xaxis_title="")
+            fig.update_layout(legend=dict(orientation="h", y=-0.3, x=0.5, xanchor="center"))
+            fig.update_layout(margin=dict(l=20, r=20, t=50, b=80))
             st.plotly_chart(fig, use_container_width=True)
 
-        with col_g2:
-            for _, row in shap_group.sort_values("Contribution_pct", ascending=False).iterrows():
-                pct   = row["Contribution_pct"]
-                group = row["Group"]
-                color = {"Financial": "#3b82f6", "Market": "#10b981",
-                         "Sentiment": "#f59e0b", "Sector": "#8b5cf6"}.get(group, "#64748b")
-                st.markdown(f"""
-                <div style='margin-bottom:0.75rem;'>
-                    <div style='display:flex;justify-content:space-between;margin-bottom:0.25rem;'>
-                        <span style='color:#e2e8f0;font-size:0.85rem;'>{group}</span>
-                        <span style='color:{color};font-family:JetBrains Mono;font-weight:700;'>{pct:.1f}%</span>
-                    </div>
-                    <div style='background:#1e293b;border-radius:4px;height:6px;'>
-                        <div style='background:{color};width:{pct}%;height:6px;border-radius:4px;'></div>
-                    </div>
-                </div>""", unsafe_allow_html=True)
+        with col_fc2:
+            fig = go.Figure(go.Bar(
+                x=fc_df["Horizon"],
+                y=fc_df["Coverage"] * 100,
+                marker_color=["#10b981" if c > 0.85 else "#f59e0b"
+                              for c in fc_df["Coverage"]],
+                text=[f"{c*100:.1f}%" for c in fc_df["Coverage"]],
+                textposition="outside"
+            ))
+            fig.add_hline(y=90, line_dash="dash", line_color="#475569",
+                          opacity=0.6, annotation_text="Target 90%",
+                          annotation_font_size=9)
+            fig.update_layout(**PLOT_THEME, height=260,
+                              title="90% CI Coverage",
+                              yaxis_title="Coverage (%)", xaxis_title="",
+                              yaxis_range=[75, 100])
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col_fc3:
+            fig = go.Figure(go.Bar(
+                x=fc_df["Horizon"], y=fc_df["R2"],
+                marker_color="#8b5cf6",
+                text=[f"{r:.3f}" for r in fc_df["R2"]],
+                textposition="outside"
+            ))
+            fig.update_layout(**PLOT_THEME, height=260,
+                              title="R² by Horizon",
+                              yaxis_title="R²", xaxis_title="",
+                              yaxis_range=[0, max(0.05, fc_df["R2"].max() * 1.5)])
+            st.plotly_chart(fig, use_container_width=True)
+
+        r2_range = f"{fc_df['R2'].min():.3f}–{fc_df['R2'].max():.3f}"
+        st.markdown(f"""
+        <div class="info-box">
+            ⚠️ <strong style="color:#f1f5f9;">Model barely beats baseline on magnitude</strong> — Model MAE is
+            only marginally better than (and for 5-day, essentially tied with) a naive baseline across all
+            horizons, and R² stays near zero ({r2_range}). Consistent with the classification results, this
+            confirms that predicting the <em>magnitude</em> of 5–20 day returns is extremely difficult beyond
+            a naive baseline in efficient markets. 90% CI coverage ({fc_df['Coverage'].min()*100:.1f}%–{fc_df['Coverage'].max()*100:.1f}%)
+            also falls short of the 90% target, suggesting the quantile intervals are somewhat too narrow.
+        </div>""", unsafe_allow_html=True)
 
     except Exception as e:
-        st.info(f"SHAP group summary not found. ({e})")
+        st.info(f"Price forecasting results not found. ({e})")
 
-    # ── Methodology notes ──────────────────────────────────────
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
-    st.markdown('<div class="section-header">📋 Methodology & Limitations</div>', unsafe_allow_html=True)
 
-    col_m1, col_m2 = st.columns(2)
-    with col_m1:
-        st.markdown("""
-        <div class="info-box">
-            <strong style="color:#f1f5f9;">What the model does</strong><br><br>
-            • Classifies post-earnings 5-day stock direction (UP/DOWN) using FinBERT
-              sentiment from earnings call transcripts combined with financial fundamentals
-              and market momentum signals<br><br>
-            • Trained on 2019–2021 data (10,184 earnings calls), evaluated on
-              2022–2023 holdout (3,387 calls) to simulate real deployment<br><br>
-            • Quantile regression forecasts the magnitude of return with 90% confidence
-              intervals — not just direction
-        </div>""", unsafe_allow_html=True)
+    # ── Methodology notes (collapsible) ─────────────────────────
+    with st.expander("📋 Methodology & Limitations", expanded=False):
+        col_m1, col_m2 = st.columns(2)
+        with col_m1:
+            st.markdown("""
+            <div class="info-box">
+                <strong style="color:#f1f5f9;">What the model does</strong><br><br>
+                • Classifies post-earnings 5-day stock direction (UP/DOWN) using FinBERT
+                  sentiment from earnings call transcripts combined with financial fundamentals
+                  and market momentum signals<br><br>
+                • Trained on 2019–2021 data (10,184 earnings calls), evaluated on
+                  2022–2023 holdout (3,387 calls) to simulate real deployment<br><br>
+                • Quantile regression forecasts the magnitude of return with 90% confidence
+                  intervals — not just direction
+            </div>""", unsafe_allow_html=True)
 
-    with col_m2:
-        st.markdown("""
-        <div class="info-box">
-            <strong style="color:#f1f5f9;">Known limitations</strong><br><br>
-            • AUC of 0.533 on 5-day horizon reflects the inherent difficulty of
-              short-term equity prediction in efficient markets — not a model failure<br><br>
-            • Hyperparameter tuning did not improve test AUC (0.530 tuned vs 0.533
-              baseline) — a known phenomenon in financial ML where CV overfits to
-              training folds<br><br>
-            • Signals should be used as one input in a broader investment process,
-              not as standalone buy/sell instructions
-        </div>""", unsafe_allow_html=True)
+        with col_m2:
+            st.markdown("""
+            <div class="info-box">
+                <strong style="color:#f1f5f9;">Known limitations</strong><br><br>
+                • AUC of 0.533 on 5-day horizon reflects the inherent difficulty of
+                  short-term equity prediction in efficient markets — not a model failure<br><br>
+                • Hyperparameter tuning did not improve test AUC (0.530 tuned vs 0.533
+                  baseline) — a known phenomenon in financial ML where CV overfits to
+                  training folds<br><br>
+                • Signals should be used as one input in a broader investment process,
+                  not as standalone buy/sell instructions
+            </div>""", unsafe_allow_html=True)
+
+    # ── What this means in practice ──────────────────────────────
+    st.markdown("""
+    <div class="finding-card" style="margin-top:0.75rem;">
+        <div class="finding-title">💡 What This Means in Practice</div>
+        <div class="finding-desc">Use the model as a ranking and signal tool, not a precise 
+                return forecaster. It performs modestly better than a random baseline at 
+                identifying which earnings calls lean UP vs DOWN, but it does not predict 
+                the magnitude of stock moves with high precision. Treat its output as one 
+                input within a broader investment process.</div>
+    </div>""", unsafe_allow_html=True)
