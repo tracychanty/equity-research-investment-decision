@@ -6,10 +6,18 @@ Data/
 *.db
 
 # ── Output files ───────────────────────────────────────────────
-Outputs/
+# Outputs/ is needed by the deployed dashboard (app.py reads specific CSVs from here).
+# Ignore everything in Outputs/ by default, then re-include just the phase folders
+# and the CSVs directly inside them. Anything else in there (e.g. event_study/plots/*.png)
+# stays ignored — app.py rebuilds charts in Plotly, it doesn't load those images.
+Outputs/*
+!Outputs/*/
+!Outputs/*/*.csv
+
 *.png
 *.jpg
 *.jpeg
+!assets/logo.png
 
 # ── Jupyter notebooks checkpoints ──────────────────────────────
 .ipynb_checkpoints/
