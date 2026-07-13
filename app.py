@@ -304,11 +304,12 @@ with st.sidebar:
     }
     </style>
     """, unsafe_allow_html=True)
-    st.image("assets/logo.png", width=170)
+    st.image("assets/logo.png", width=110)
     st.markdown("""
     <div style='padding:1rem 0 1.5rem 0;'>
         <div style='font-size:1.5rem;font-weight:700;color:#f1f5f9;'>Investor Copilot</div>
-        <div style='font-size:0.85rem;color:#475569;margin-top:0.2rem;'>Equity Research Intelligence</div>
+        <div style='font-size:1.05rem;font-weight:600;color:#94a3b8;margin-top:0.3rem;'>EarningsEdge</div>
+        <div style='font-size:0.78rem;color:#475569;margin-top:0.1rem;'>Equity Research Intelligence</div>
     </div>
     """, unsafe_allow_html=True)
 
