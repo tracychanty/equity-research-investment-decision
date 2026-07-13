@@ -1359,9 +1359,11 @@ elif page == "🏭  Peer Benchmarking":
                     orientation="h",
                     hovertemplate=f"{dim}: " + "%{x:.3f}<extra></extra>"
                 ))
-            fig_contrib.update_layout(**PLOT_THEME, height=max(180, 55 * len(focus_tickers)),
+            fig_contrib.update_layout(**PLOT_THEME, height=max(220, 55 * len(focus_tickers) + 90),
                                       barmode="stack", xaxis_title="Contribution to Overall Score",
-                                      yaxis_title="", legend=dict(orientation="h", y=-0.25))
+                                      yaxis_title="",
+                                      legend=dict(orientation="h", y=1.25, x=0, xanchor="left", yanchor="bottom"))
+            fig_contrib.update_layout(margin=dict(t=90, b=60))
             st.plotly_chart(fig_contrib, use_container_width=True)
             st.caption("Segment width = each dimension's actual weighted contribution (bar total = "
                       "Overall Score), unlike the radar above which shows all six as visually equal.")
