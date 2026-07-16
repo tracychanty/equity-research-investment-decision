@@ -2164,3 +2164,6 @@ elif page == "📊  Model Validation":
                 the magnitude of stock moves with high precision. Treat its output as one 
                 input within a broader investment process.</div>
     </div>""", unsafe_allow_html=True)
+
+    elif page == "📊  Model Validation":
+    
