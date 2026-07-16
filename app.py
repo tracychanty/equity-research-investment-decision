@@ -2165,5 +2165,296 @@ elif page == "📊  Model Validation":
                 input within a broader investment process.</div>
     </div>""", unsafe_allow_html=True)
 
-    elif page == "📊  Model Validation":
+elif page == "📊  Model Validation":
     
+# PAGE 6 — AI RESEARCH ASSISTANT
+elif page == "🧠  AI Research Assistant":
+
+    st.markdown(
+        '<div class="page-title">AI Research Assistant</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        <div class="page-subtitle">
+            Upload earnings transcripts, 10-Ks, or 10-Qs and ask
+            evidence-based financial questions
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        <div class="info-box">
+            This assistant retrieves relevant passages from uploaded
+            financial documents and uses a locally hosted Qwen model
+            to generate grounded answers. It does not provide
+            personalized investment advice.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    if "rag_messages" not in st.session_state:
+        st.session_state.rag_messages = []
+
+    if "rag_vector_store" not in st.session_state:
+        st.session_state.rag_vector_store = None
+
+    if "rag_file_signature" not in st.session_state:
+        st.session_state.rag_file_signature = None
+
+    if "rag_chunk_count" not in st.session_state:
+        st.session_state.rag_chunk_count = 0
+
+    def create_rag_file_signature(files):
+        signature_parts = []
+
+        for uploaded_file in files:
+            uploaded_file.seek(0)
+            content = uploaded_file.read()
+            uploaded_file.seek(0)
+
+            content_hash = hashlib.md5(
+                content
+            ).hexdigest()
+
+            signature_parts.append(
+                f"{uploaded_file.name}-{content_hash}"
+            )
+
+        return "|".join(
+            sorted(signature_parts)
+        )
+
+    st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+
+    left_col, right_col = st.columns(
+        [1, 2]
+    )
+
+    with left_col:
+        st.markdown(
+            '<div class="section-header">Documents</div>',
+            unsafe_allow_html=True
+        )
+
+        uploaded_files = st.file_uploader(
+            "Upload financial documents",
+            type=[
+                "pdf",
+                "txt"
+            ],
+            accept_multiple_files=True,
+            key="rag_uploaded_files"
+        )
+
+        top_k = st.slider(
+            "Retrieved evidence chunks",
+            min_value=2,
+            max_value=8,
+            value=4,
+            key="rag_top_k"
+        )
+
+        process_button = st.button(
+            "Process Documents",
+            use_container_width=True,
+            type="primary"
+        )
+
+        clear_button = st.button(
+            "Clear Chat",
+            use_container_width=True
+        )
+
+        if clear_button:
+            st.session_state.rag_messages = []
+            st.rerun()
+
+        if st.session_state.rag_vector_store is not None:
+            st.success(
+                f"{st.session_state.rag_chunk_count} "
+                "searchable chunks ready"
+            )
+
+        st.markdown(
+            """
+            <div class="info-box" style="margin-top:1rem;">
+                <strong style="color:#f1f5f9;">
+                    Example questions
+                </strong><br><br>
+
+                • What are the main business risks?<br>
+                • What did management say about revenue growth?<br>
+                • Are margins improving or weakening?<br>
+                • What are the key forward-looking statements?<br>
+                • What uncertainties did management discuss?
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with right_col:
+        st.markdown(
+            '<div class="section-header">Research Conversation</div>',
+            unsafe_allow_html=True
+        )
+
+        if process_button:
+            if not uploaded_files:
+                st.warning(
+                    "Please upload at least one PDF or TXT file."
+                )
+
+            else:
+                current_signature = create_rag_file_signature(
+                    uploaded_files
+                )
+
+                try:
+                    with st.spinner(
+                        "Reading documents and building the search index..."
+                    ):
+                        documents = load_uploaded_files(
+                            uploaded_files
+                        )
+
+                        vector_store, chunks = build_vector_store(
+                            documents
+                        )
+
+                        st.session_state.rag_vector_store = vector_store
+                        st.session_state.rag_chunk_count = len(chunks)
+                        st.session_state.rag_file_signature = (
+                            current_signature
+                        )
+                        st.session_state.rag_messages = []
+
+                    st.success(
+                        f"Processed {len(uploaded_files)} file(s) "
+                        f"into {len(chunks)} searchable chunks."
+                    )
+
+                except Exception as error:
+                    st.error(
+                        f"Could not process the documents: {error}"
+                    )
+
+        for message in st.session_state.rag_messages:
+            with st.chat_message(
+                message["role"]
+            ):
+                st.markdown(
+                    message["content"]
+                )
+
+                if (
+                    message["role"] == "assistant"
+                    and "sources" in message
+                ):
+                    with st.expander(
+                        "Retrieved Evidence"
+                    ):
+                        for index, source in enumerate(
+                            message["sources"],
+                            start=1
+                        ):
+                            st.markdown(
+                                f"**Source {index}: "
+                                f"{source['file']}, "
+                                f"page {source['page']}**"
+                            )
+
+                            st.write(
+                                source["content"]
+                            )
+
+        question = st.chat_input(
+            "Ask a question about the uploaded financial documents",
+            key="rag_chat_input"
+        )
+
+        if question:
+            if st.session_state.rag_vector_store is None:
+                st.warning(
+                    "Upload and process at least one document first."
+                )
+
+            else:
+                st.session_state.rag_messages.append(
+                    {
+                        "role": "user",
+                        "content": question
+                    }
+                )
+
+                with st.chat_message("user"):
+                    st.markdown(question)
+
+                with st.chat_message("assistant"):
+                    with st.spinner(
+                        "Retrieving evidence and generating an answer..."
+                    ):
+                        try:
+                            answer, docs = answer_question(
+                                vector_store=(
+                                    st.session_state.rag_vector_store
+                                ),
+                                question=question,
+                                chat_history=(
+                                    st.session_state.rag_messages
+                                ),
+                                top_k=top_k
+                            )
+
+                            st.markdown(answer)
+
+                            sources = []
+
+                            for doc in docs:
+                                sources.append(
+                                    {
+                                        "file": doc.metadata.get(
+                                            "source",
+                                            "Unknown source"
+                                        ),
+                                        "page": doc.metadata.get(
+                                            "page",
+                                            "Unknown page"
+                                        ),
+                                        "content": doc.page_content
+                                    }
+                                )
+
+                            with st.expander(
+                                "Retrieved Evidence"
+                            ):
+                                for index, source in enumerate(
+                                    sources,
+                                    start=1
+                                ):
+                                    st.markdown(
+                                        f"**Source {index}: "
+                                        f"{source['file']}, "
+                                        f"page {source['page']}**"
+                                    )
+
+                                    st.write(
+                                        source["content"]
+                                    )
+
+                            st.session_state.rag_messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": answer,
+                                    "sources": sources
+                                }
+                            )
+
+                        except Exception as error:
+                            st.error(
+                                f"Could not generate an answer: {error}"
+                            )
