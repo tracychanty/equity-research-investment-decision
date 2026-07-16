@@ -5,6 +5,14 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
+import hashlib
+
+from rag_chatbot import (
+    answer_question,
+    build_vector_store,
+    load_uploaded_files
+)
+
 # ── Page config ───────────────────────────────────────────────
 st.set_page_config(
     page_title="Investor Copilot",
