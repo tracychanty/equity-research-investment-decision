@@ -314,11 +314,12 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     page = st.radio("Navigation", [
-        "🏢  Company Overview",
-        "🏭  Peer Benchmarking",
-        "💡  Investment Recommendations",
-        "🔍  Explainability",
-        "📊  Model Validation",
+    "🏢  Company Overview",
+    "🏭  Peer Benchmarking",
+    "💡  Investment Recommendations",
+    "🔍  Explainability",
+    "📊  Model Validation",
+    "🧠  AI Research Assistant",
     ], label_visibility="collapsed")
 
     st.markdown("""
