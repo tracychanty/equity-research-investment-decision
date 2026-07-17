@@ -6,12 +6,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 import hashlib
+import os
 
-from rag_chatbot import (
-    answer_question,
-    build_vector_store,
-    load_uploaded_files
-)
+
 
 # ── Page config ───────────────────────────────────────────────
 st.set_page_config(
@@ -2167,6 +2164,52 @@ elif page == "📊  Model Validation":
     
 # PAGE 6 — AI RESEARCH ASSISTANT
 elif page == "🧠  AI Research Assistant":
+    LOCAL_RAG_ENABLED = (
+        os.getenv("ENABLE_LOCAL_RAG", "false").lower() == "true"
+    )
+
+    if not LOCAL_RAG_ENABLED:
+        st.markdown(
+            '<div class="page-title">AI Research Assistant</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div class="page-subtitle">
+                Evidence-based financial document research powered by local AI
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <div class="info-box">
+                <strong style="color:#f1f5f9;">
+                    Local demonstration feature
+                </strong><br><br>
+
+                The AI Research Assistant uses a locally hosted Qwen model
+                through Ollama. Because Streamlit Community Cloud cannot access
+                the Ollama service running on the developer's computer, this
+                feature is available in the local deployment only.<br><br>
+
+                The online dashboard remains available for company analysis,
+                peer benchmarking, recommendations, explainability, and model
+                validation.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.stop()
+
+    from rag_chatbot import (
+        answer_question,
+        build_vector_store,
+        load_uploaded_files
+    )
 
     st.markdown(
         '<div class="page-title">AI Research Assistant</div>',
