@@ -1,3 +1,7 @@
+streamlit
+pandas
+numpy
+plotly
 langchain
 langchain-core
 langchain-community
