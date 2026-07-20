@@ -2193,7 +2193,7 @@ elif page == "🧠  AI Research Assistant":
                 The AI Research Assistant uses a locally hosted Qwen model
                 through Ollama. Because Streamlit Community Cloud cannot access
                 the Ollama service running on the developer's computer, this
-                feature is available in the local deployment only.<br><br>
+                feature is available in the local deployment only.
 
                 The online dashboard remains available for company analysis,
                 peer benchmarking, recommendations, explainability, and model
