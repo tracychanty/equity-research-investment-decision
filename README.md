@@ -2,9 +2,12 @@
 
 **AI-Powered Equity Research & Investment Decision Platform**
 
-Tracy Chan ([tsz.y.chan@mail.mcgill.ca](mailto:tsz.y.chan@mail.mcgill.ca)) · Yanxin Li ([yanxin.li@mail.mcgill.ca](mailto:yanxin.li@mail.mcgill.ca))
+
+Team: Tracy Chan ([tsz.y.chan@mail.mcgill.ca](mailto:tsz.y.chan@mail.mcgill.ca)) · Yanxin Li ([yanxin.li@mail.mcgill.ca](mailto:yanxin.li@mail.mcgill.ca))
+
 
 **Live dashboard:** [investor-copilot.streamlit.app](https://investor-copilot.streamlit.app/)
+
 **Repository:** [github.com/tracychanty/equity-research-investment-decision](https://github.com/tracychanty/equity-research-investment-decision)
 
 ---
@@ -15,11 +18,13 @@ Investor Copilot turns unstructured earnings-call transcripts into an explainabl
 
 The goal is to give retail investors, students, and early-career professionals access to qualitative-signal research that is usually reserved for institutional analysts, without requiring their budget or headcount.
 
+
 ## Why This Exists
 
 Public companies release a large amount of qualitative information each quarter through earnings calls, including tone, management confidence, and hedging language. Prior research shows that this language can move stock prices beyond what is explained by reported financial numbers alone (Loughran & McDonald, 2011; Ke, Kelly & Xiu, 2019). But interpreting that information at scale is expensive, time-consuming, and difficult to do consistently.
 
 Investor Copilot automates that scoring process, connects the signal to predicted market reaction, and explains why the model reaches its conclusions instead of operating as a black box.
+
 
 ## Project Pipeline
 
@@ -37,13 +42,10 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 | S1 | Event Study *(stretch goal)* | Test whether sentiment is associated with abnormal returns around earnings |
 | S2 | RAG Financial Chatbot *(stretch goal, local-only)* | Create a local RAG-based financial Q&A tool for uploaded filings |
 
-## Data
-
-
-
 **Train/test split** (chronological, to avoid look-ahead bias): 2019–2021 train (10,831 rows, 2,052 tickers) · 2022–2023 test (3,673 rows, 1,031 tickers).
 
 **Sources:** Motley Fool earnings call transcripts (Kaggle), yfinance daily OHLCV, yfinance company fundamentals, S&P 500 (`^GSPC`) as market benchmark.
+
 
 ## Data
 
@@ -57,6 +59,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 **Train/test split** (chronological, to avoid look-ahead bias): 2019–2021 train (10,831 rows; 2,052 tickers) · 2022–2023 test (3,673 rows; 1,031 tickers).
 
 **Sources:** Motley Fool earnings-call transcripts (Kaggle), yfinance daily OHLCV, yfinance company fundamentals, and the S&P 500 (`^GSPC`) as the market benchmark.
+
 
 ## Phase Highlights
 
@@ -127,6 +130,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
   4. **Explainability & Economic Evidence** — SHAP drivers and event-study validation
   5. **Model Validation** — classification, forecasting, and robustness metrics
   6. **AI Research Assistant** — local RAG chatbot for uploaded financial documents
+
      
 ## Success Metrics vs. Proposal
 
@@ -138,6 +142,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 | SHAP coverage | 100% of predictions | 27.2% of test set (1,000 / 3,673) | ⚠️ Partial |
 | Backtest Sharpe ratio | ≥ 1.0 or beat Equal-Weight | 1.552 — clears the floor, trails Equal-Weight (1.916) | ⚠️ Partial |
 
+
 ## What Holds Up
 
 - Near-complete transcript coverage enabled broad and consistent sentiment analysis
@@ -147,6 +152,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 - The featured portfolio strategy cleared the project’s Sharpe ratio floor
 - The dashboard successfully integrated the pipeline into one working analyst-facing tool
 
+
 ## Limitations
 
 - Directional classification performance was modest (AUC 0.53), limiting standalone predictive strength
@@ -154,6 +160,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 - SHAP explanations were generated for a sample of the test set rather than all predictions
 - The `ML_Optimized` portfolio did not outperform the simpler `Equal_Weight` benchmark
 - The RAG assistant remains local-only and is not yet integrated into the hosted dashboard
+
   
 ## Future Work
 
@@ -162,6 +169,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 - Strengthen portfolio construction with turnover-aware optimization and a full covariance-based risk model
 - Formally benchmark dashboard query latency against the <5 second target
 - Integrate the RAG assistant into the hosted dashboard when deployment and API budget allow
+
   
 ## Tech Stack
 
@@ -172,6 +180,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 - **Dashboard / Visualization:** Streamlit and Plotly
 - **Development Environments:** Jupyter, Google Colab (T4 GPU), and Kaggle Notebooks
 - **Deployment:** Streamlit Community Cloud
+
 
 ## Repository Structure
 
@@ -227,6 +236,7 @@ equity-research-investment-decision/
 ├── requirements-local.txt               # local development dependencies
 └── README.md
 ```
+
 
 ## References
 
