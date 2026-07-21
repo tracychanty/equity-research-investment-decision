@@ -59,7 +59,7 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 
 **Sources:** Motley Fool earnings-call transcripts (Kaggle), yfinance daily OHLCV, yfinance company fundamentals, and the S&P 500 (`^GSPC`) as the market benchmark.
 
-> **Data files are not stored in this repository due to size constraints.**
+> Data files are not stored in this repository due to size constraints.
 > Download the raw and intermediate data files from [Google Drive](https://drive.google.com/drive/folders/1NYfYCJvgmE7Gay2oawZWb8ZWBTFLSW38?usp=drive_link).
 
 
