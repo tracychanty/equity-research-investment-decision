@@ -1,8 +1,11 @@
+# Investor Copilot — EarningsEdge
+
 **AI-Powered Equity Research & Investment Decision Platform**
 
 Tracy Chan ([tsz.y.chan@mail.mcgill.ca](mailto:tsz.y.chan@mail.mcgill.ca)) · Yanxin Li ([yanxin.li@mail.mcgill.ca](mailto:yanxin.li@mail.mcgill.ca))
 
 **Live dashboard:** [investor-copilot.streamlit.app](https://investor-copilot.streamlit.app/)
+**Repository:** [github.com/tracychanty/equity-research-investment-decision](https://github.com/tracychanty/equity-research-investment-decision)
 
 ---
 
@@ -169,37 +172,60 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 - **Dashboard / Visualization:** Streamlit and Plotly
 - **Development Environments:** Jupyter, Google Colab (T4 GPU), and Kaggle Notebooks
 - **Deployment:** Streamlit Community Cloud
-  
+
 ## Repository Structure
 
-```
-Outputs/
-├── feature_engineering/
-│   └── ml_dataset_enhanced.csv
-├── classification/
-│   ├── final_model_comparison.csv
-│   └── robustness_summary.csv
-├── price_forecasting/
-│   └── quantile_forecast_summary_tuned.csv
-├── shap_explainability/
-│   ├── shap_values_test.csv
-│   ├── shap_feature_importance.csv
-│   ├── shap_group_summary.csv
-│   └── sentiment_feature_importance.csv
-├── industry_benchmarking/
-│   └── industry_benchmarking_output.csv
-├── event_study/
-│   ├── abnormal_returns.csv
-│   ├── significance_summary.csv
-│   ├── monotonic_relationship.csv
-│   └── sector_car_summary.csv
-└── portfolio_construction/
-    ├── v3_portfolio_weights.csv
-    ├── v3_portfolio_net_returns_wide.csv
-    ├── v3_portfolio_cumulative_returns.csv
-    ├── portfolio_performance_metrics_report.csv
-    └── main_strategy_summary.csv
-```
+```text
+equity-research-investment-decision/
+├── .streamlit/
+│   └── config.toml                      # dashboard theme config
+├── assets/
+│   └── logo.png
+├── Outputs/
+│   ├── classification/
+│   │   ├── final_model_comparison.csv
+│   │   └── robustness_summary.csv
+│   ├── event_study/
+│   │   ├── abnormal_returns.csv
+│   │   ├── monotonic_relationship.csv
+│   │   ├── sector_car_summary.csv
+│   │   └── significance_summary.csv
+│   ├── feature_engineering/
+│   │   └── ml_dataset_enhanced.csv
+│   ├── industry_benchmarking/
+│   │   └── industry_benchmarking_output.csv
+│   ├── portfolio_construction/
+│   │   ├── main_strategy_summary.csv
+│   │   ├── portfolio_performance_metrics_report.csv
+│   │   ├── v3_portfolio_cumulative_returns.csv
+│   │   ├── v3_portfolio_drawdowns.csv          
+│   │   ├── v3_portfolio_net_returns_wide.csv
+│   │   └── v3_portfolio_weights.csv
+│   ├── price_forecasting/
+│   │   └── quantile_forecast_summary_tuned.csv
+│   └── shap_explainability/
+│       ├── sentiment_feature_importance.csv
+│       ├── shap_feature_importance.csv
+│       ├── shap_group_summary.csv
+│       └── shap_values_test.csv
+├── app.py                               # Streamlit dashboard
+├── data_preparation.ipynb               # Phase 1
+├── sentiment_extraction.ipynb           # Phase 2
+├── sentiment_extraction_step6.ipynb     # Phase 2 - deduplication step
+├── feature.py                           # Phase 3
+├── classification.ipynb                 # Phase 4
+├── price_forecasting.py                 # Phase 5
+├── shap.ipynb                           # Phase 6
+├── industry benchmark.py                # Phase 7
+├── portfolio_prepare.py                 # Phase 8 - candidate universe prep
+├── portfolio_construct.py               # Phase 8 - weight construction
+├── portfolio_backtest.py                # Phase 8 — v3 optimized backtest
+├── portfolio_metrics.py                 # Phase 8 — performance metrics
+├── event_study.ipynb                    # Stretch Goal S1
+├── rag_chatbot.py                       # Stretch Goal S2 (local-only)
+├── requirements.txt                     # deployment dependencies
+├── requirements-local.txt               # local development dependencies
+└── README.md
 
 ## References
 
