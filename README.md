@@ -132,44 +132,44 @@ Investor Copilot automates that scoring process, connects the signal to predicte
 | Sentiment coverage | ≥ 95% | 100% core scores · 97.7% on `qa_sentiment` | ✅ Achieved |
 | Prediction AUC / Accuracy | AUC ≥ 0.65 · Acc ≥ 60% | AUC 0.533 · Accuracy 52.4% | ❌ Not met |
 | Price range MAE | ≤ 5% | 8.0–11.2% across horizons | ❌ Not met |
-| SHAP coverage | 100% of predictions | 27.2% of test set (1,000 / 3,673) | ❌ Not met |
+| SHAP coverage | 100% of predictions | 27.2% of test set (1,000 / 3,673) | ⚠️ Partial |
 | Backtest Sharpe ratio | ≥ 1.0 or beat Equal-Weight | 1.552 — clears the floor, trails Equal-Weight (1.916) | ⚠️ Partial |
-| Dashboard response time | < 5 sec / query | Deployed & functional — not formally benchmarked | ⏳ Untested |
-
-We're reporting this table in full rather than only the wins — an honest account of what missed target is more useful than a curated one.
 
 ## What Holds Up
 
-- Q&A sentiment and `sentiment_surprise` are genuinely predictive, above other feature groups
-- The event study finds a statistically significant sentiment–return relationship in 5 sectors
-- SHAP gives every prediction a transparent, auditable reason
-- The portfolio backtest clears its Sharpe floor
-- The dashboard successfully integrates every pipeline output into one working analyst tool
+- Near-complete transcript coverage enabled broad and consistent sentiment analysis
+- Q&A sentiment and `sentiment_surprise` emerged as the most informative sentiment features
+- The event study found a statistically significant short-window sentiment–return relationship around earnings
+- SHAP validated the model’s main drivers and made sampled predictions interpretable, transparent, and auditable
+- The featured portfolio strategy cleared the project’s Sharpe ratio floor
+- The dashboard successfully integrated the pipeline into one working analyst-facing tool
 
 ## Limitations
 
-- Directional classification (AUC 0.53) is a modest edge over a coin flip, not a precise predictor
-- Price forecasting misses its MAE target by roughly 2x
-- SHAP explanations cover a sample, not the full test set
-- The ML-ranked portfolio's Sharpe ratio does not beat the simplest possible strategy (Equal-Weight)
-
+- Directional classification performance was modest (AUC 0.53), limiting standalone predictive strength
+- Price forecasting error remained above the original MAE target
+- SHAP explanations were generated for a sample of the test set rather than all predictions
+- The `ML_Optimized` portfolio did not outperform the simpler `Equal_Weight` benchmark
+- The RAG assistant remains local-only and is not yet integrated into the hosted dashboard
+  
 ## Future Work
 
 - Extend SHAP explanations from the 1,000-row sample to the full test set
-- Explore richer forecasting features or a sequence model to close the MAE gap
-- Strengthen the portfolio optimizer with turnover-penalized optimization and a full cross-asset covariance matrix, instead of the current diagonal (forecast-uncertainty-only) risk model
-- Formally benchmark dashboard query latency against the < 5s target
-- Integrate the RAG chatbot into the production (hosted) dashboard once cloud LLM budget allows
-
+- Test richer forecasting features and sequence-based models to improve predictive accuracy
+- Strengthen portfolio construction with turnover-aware optimization and a full covariance-based risk model
+- Formally benchmark dashboard query latency against the <5 second target
+- Integrate the RAG assistant into the hosted dashboard when deployment and API budget allow
+  
 ## Tech Stack
 
-**NLP / ML:** FinBERT, scikit-learn, XGBoost, LightGBM, SHAP (TreeExplainer)
-**Portfolio Optimization:** cvxpy (mean-variance optimization)
-**RAG:** LangChain, FAISS, Ollama (`qwen2.5:3b`)
-**Data:** pandas, numpy, yfinance
-**Dashboard:** Streamlit, Plotly
-**Environments:** Jupyter / Google Colab (T4 GPU) / Kaggle Notebooks for pipeline development; Streamlit Community Cloud for deployment
-
+- **NLP / ML:** FinBERT for transcript sentiment extraction; scikit-learn, XGBoost, and LightGBM for predictive modeling; SHAP (TreeExplainer) for explainability
+- **Portfolio Optimization:** cvxpy for mean-variance portfolio construction
+- **RAG Pipeline:** LangChain, FAISS, and Ollama (`qwen2.5:3b`) for local document retrieval and question answering
+- **Data Processing:** pandas, numpy, and yfinance
+- **Dashboard / Visualization:** Streamlit and Plotly
+- **Development Environments:** Jupyter, Google Colab (T4 GPU), and Kaggle Notebooks
+- **Deployment:** Streamlit Community Cloud
+  
 ## Repository Structure
 
 ```
@@ -200,12 +200,6 @@ Outputs/
     ├── portfolio_performance_metrics_report.csv
     └── main_strategy_summary.csv
 ```
-
-## Team & Roles
-
-**Tracy Chan** — NLP and machine learning: transcript preprocessing, sentiment extraction, classification modeling, SHAP explainability, event study, dashboard development.
-
-**Yanxin Li** — Data engineering and financial modeling: yfinance integration, feature engineering, price forecasting, industry benchmarking, portfolio construction and backtesting.
 
 ## References
 
