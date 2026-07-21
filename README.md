@@ -226,6 +226,7 @@ equity-research-investment-decision/
 ├── requirements.txt                     # deployment dependencies
 ├── requirements-local.txt               # local development dependencies
 └── README.md
+```
 
 ## References
 
