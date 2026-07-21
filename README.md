@@ -3,8 +3,7 @@
 **AI-Powered Equity Research & Investment Decision Platform**
 
 
-Team: Tracy Chan ([tsz.y.chan@mail.mcgill.ca](mailto:tsz.y.chan@mail.mcgill.ca)) · Yanxin Li ([yanxin.li@mail.mcgill.ca](mailto:yanxin.li@mail.mcgill.ca))
-
+**Team: Tracy Chan ([tsz.y.chan@mail.mcgill.ca](mailto:tsz.y.chan@mail.mcgill.ca)) · Yanxin Li ([yanxin.li@mail.mcgill.ca](mailto:yanxin.li@mail.mcgill.ca))**
 
 **Live dashboard:** [investor-copilot.streamlit.app](https://investor-copilot.streamlit.app/)
 
